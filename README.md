@@ -1,2 +1,2 @@
-# frostt_tools
+# frostt-tools
 Tools for parsing and managing the FROSTT datasets and website.
