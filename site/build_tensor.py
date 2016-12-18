@@ -3,6 +3,7 @@
 import sys
 import gzip
 import argparse
+from functools import reduce
 
 ##############################################################################
 #
@@ -125,8 +126,11 @@ with open(env.output, 'w') as fout:
   print("order: '{}'".format(order), file=fout)
   print("nnz: '{:,d}'".format(nonzeros), file=fout)
 
-  dims = ['{:,d}'.format(d) for d in dims]
-  print('dims: {}'.format(dims[:order]), file=fout)
+  dim_str= ['{:,d}'.format(d) for d in dims]
+  print('dims: {}'.format(dim_str[:order]), file=fout)
+  
+  density = float(nonzeros) / reduce(lambda x, y: float(x) * float(y), dims)
+  print("density: '{:0.3e}'".format(density), file=fout)
 
   print('files:', file=fout)
   basename = env.tensor[env.tensor.rfind('/')+1 :]
