@@ -10,9 +10,9 @@ from collections import defaultdict
 # UTILITY FUNCTIONS
 ###############################################################################
 
-# convert UTC to monthly resolution
+# convert UTC to daily resolution
 def convert_utc(utc_int):
-  return int(utc_int / (60 * 60 * 24 * 30))
+  return int(utc_int / (60 * 60 * 24))
 
 
 def write_ids(fname, dic):
@@ -85,9 +85,7 @@ def write_tags(fname, ofname):
       m = get_id(movie_ids, m_orig)
       t = get_id(tag_ids, row[2].lower())
       d = get_id(date_ids, convert_utc(int(row[3])))
-
       print('{} {} {} {} 1'.format(u, m, t, d), file=tag_file)
-
 
   tag_file.close()
 
@@ -97,6 +95,25 @@ def assign_rating_ids(fname):
     assign_id(user_ids, int(row[0]))
     assign_id(movie_ids, int(row[1]))
     assign_id(dates, convert_utc(int(row[3])))
+
+
+def map_movie_ids(fname, movie_ids):
+  new_ids = dict()
+
+  # read in movie names
+  movie_names = dict()
+  # id,title,genres
+  with open(fname, 'r') as fin:
+    csvreader = csv.reader(fin, delimiter=',', quotechar='"')
+    next(csvreader) # grab header
+    for row in csvreader:
+      movie_names[int(row[0])] = row[1]
+
+  # new map ids to names
+  for k in movie_ids.keys():
+    new_ids[movie_names[k]] = movie_ids[k]
+
+  return new_ids
 
 
 def write_ratings(fname, ofname):
@@ -115,13 +132,14 @@ def write_ratings(fname, ofname):
 # GO GO GO
 ###############################################################################
 
-if len(sys.argv) != 3:
-  print('usage: {} <ratings.csv> <tags.csv>'.format(sys.argv[0]))
+if len(sys.argv) != 4:
+  print('usage: {} <ratings.csv> <tags.csv> <movies.csv>'.format(sys.argv[0]))
   sys.exit(1)
 
 
 rating_name = sys.argv[1]
 tag_name = sys.argv[2]
+movie_fname = sys.argv[3]
 
 get_rated_movies(rating_name)
 
@@ -145,15 +163,17 @@ for i in range(len(uniques)):
 del uniques
 del dates
 
-# write ids
-write_ids('users.txt', user_ids)
-write_ids('movies.txt', movie_ids)
-write_ids('tags.txt', tag_ids)
-write_ids('dates.txt', date_ids)
+# Map movie IDs back to actual movie titles
+movie_names = map_movie_ids(movie_fname, movie_ids)
 
+# write ids
+write_ids('mode-1-users.map', user_ids)
+write_ids('mode-2-movies.map', movie_names)
+write_ids('mode-3-tags.map', tag_ids)
+write_ids('mode-4-dates.map', date_ids)
 
 # go back over data and write tensor
-write_ratings(rating_name, 'ml20m_ratings.tns')
-write_tags(tag_name, 'ml20m_tags.tns')
+write_ratings(rating_name, 'movielens20m-ratings.tns')
+write_tags(tag_name, 'movielens20m-tags.tns')
 
 
