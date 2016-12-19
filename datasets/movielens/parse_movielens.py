@@ -55,11 +55,7 @@ rated_movies = set()
 
 # convert UTC to weekly resolution
 def convert_utc(utc_int):
-  return int(utc_int / (60 * 60 * 24 * 7))
-
-
-def lookup_movie(m_id):
-  return movie_ids[movie_names[m_id]]
+  return int(utc_int / (60 * 60 * 24))
 
 
 def write_ids(fname, dic):
@@ -71,10 +67,7 @@ def write_ids(fname, dic):
 
   with open(fname, 'w') as fout:
     for i in range(1, len(dic)+1):
-      if i in inv:
-        print('{}'.format(inv[i]), file=fout)
-      else:
-        print('UNKNOWN', file=fout)
+      print('{}'.format(inv[i]), file=fout)
 
 def assign_id(dic, item):
   if item not in dic:
@@ -145,7 +138,7 @@ def write_ratings(fname, ofname):
 
 
 def write_tags(fname, ofname):
-  with open(fname, 'w') as tag_file:
+  with open(ofname, 'w') as tag_file:
     for row in read_csv(fname):
       m_orig = int(row[1])
       title = movie_names[m_orig]
