@@ -9,10 +9,15 @@
 #   time x person x action x x-location x y-location
 #
 # and the values are always 1.0.
+#
+# Note that some duplicates are present in the dataset. You can use
+#   $ splatt check delicious4d.tns --fix=fixed.tns
+# to remove them.
 # 
 # File format:
 #   Timestamp,id,type,X,Y
 ###############################################################################
+
 
 import sys
 import csv
@@ -58,38 +63,42 @@ def read_csv(fname):
       yield row
 
 
-times = dict()
-ids   = dict()
-types = dict()
-xs    = dict()
-ys    = dict()
-
+times   = dict()
+ids     = dict()
+actions = dict()
+xs      = dict()
+ys      = dict()
 
 # file is in the format: date, userID, itemID, tag
+nnz = 0
 for csv_file in sys.argv[1:]:
   for row in read_csv(csv_file):
-
-    time      = get_map_id(times, row[0])
-    person_id = get_map_id(ids, row[1])
-    action    = get_map_id(types, row[2])
-    x         = get_map_id(xs, row[3])
-    y         = get_map_id(ys, row[4])
-    
-    print('{} {} {} 1.0'.format(time, person_id, action), file=fout3)
-    print('{} {} {} {} {} 1.0'.format(time, person_id, action, x, y), file=fout5)
+    if len(row) == 5:
+      time      = get_map_id(times, row[0])
+      person_id = get_map_id(ids, row[1])
+      action    = get_map_id(actions, row[2])
+      x         = get_map_id(xs, row[3])
+      y         = get_map_id(ys, row[4])
+      
+      print('{} {} {} 1.0'.format(time, person_id, action), file=fout3)
+      print('{} {} {} {} {} 1.0'.format(time, person_id, action, x, y), file=fout5)
+      nnz += 1
+    else:
+      print(row)
 
 fout3.close()
 fout5.close()
 
-print('#times: {}'.format(len(times)))
-print('#persons: {}'.format(len(ids)))
-print('#types: {}'.format(len(types)))
-print('#xs: {}'.format(len(xs)))
-print('#ys: {}'.format(len(ys)))
+print('nnz: {:,d}'.format(nnz))
+print('#times: {:,d}'.format(len(times)))
+print('#persons: {:,d}'.format(len(ids)))
+print('#actions: {:,d}'.format(len(actions)))
+print('#xs: {:,d}'.format(len(xs)))
+print('#ys: {:,d}'.format(len(ys)))
 
-write_map(times, 'mode-1-times.map')
-write_map(ids,   'mode-2-persons.map')
-write_map(types, 'mode-3-types.map')
-write_map(xs,    'mode-4-xlocs.map')
-write_map(ys,    'mode-5-ylocs.map')
+write_map(times,   'mode-1-times.map')
+write_map(ids,     'mode-2-persons.map')
+write_map(actions, 'mode-3-actions.map')
+write_map(xs,      'mode-4-xlocs.map')
+write_map(ys,      'mode-5-ylocs.map')
 
