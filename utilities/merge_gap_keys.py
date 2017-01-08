@@ -28,7 +28,10 @@ with open(gap_fname, 'r') as gap_file:
   for line in gap_file:
     # new ID
     key_id = int(line.strip())
-    key = keys[key_id - 1]
+    try:
+      key = keys[key_id - 1]
+    except:
+      print('keys: {} found key {}'.format(len(keys), key_id))
 
     print(key, file=fout)
 fout.close()
