@@ -1,10 +1,30 @@
 #!/usr/bin/env python3
 
 import sys
+
 import argparse
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Prune infrequent slices from a tensor.')
+
+my_description = '''
+Prune empty (or infrequent) slices from a tensor. With default options, this
+script scans a tensor file and removes empty slices. Those slices are then
+specified with "mode-X-gaps.map" files which map the old dimensionality into
+the new one.
+
+Infrequent items can also be pruned by specifying "--mode=MODE,FREQ"
+options. For example, "--mode=3,5" will remove any slices in the third mode
+with less than five non-zeros.
+
+NOTE: since this process removes non-zeros, it can cause slices in other modes
+to become infrequent or empty. If any non-zeros are pruned, this script should
+be re-run until no additional empty/infrequent slices are present.  Map files
+should be merged with `merge_gap_keys.py` after each run, as they will be
+overwritten if a mode is pruned additional times.
+'''
+
+parser = argparse.ArgumentParser(description=my_description,
+    formatter_class=argparse.RawTextHelpFormatter)
 
 parser.add_argument('tensor', type=str, help='tensor to prune')
 parser.add_argument('output', type=str, help='output tensor')

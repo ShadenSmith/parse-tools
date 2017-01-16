@@ -48,6 +48,7 @@ int main(int argc, char ** argv)
 
   if(argc != 4) {
     cout << "usage: " << argv[0] << " <tensor> <nmodes> <output.tns>" << endl;
+    cout << "NOTE: <tensor> MUST be sorted before running this program." << endl;
     return 1;
   }
 
