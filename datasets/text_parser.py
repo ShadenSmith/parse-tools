@@ -29,8 +29,6 @@ def parse_text(text_string):
       # sometimes the stemmer crashes due to maximum recursion depth?
       try:
         yield stemmer.stem(word)
-      except:
-        nbailed += 1
-        continue
+      except GeneratorExit:
+        break
 
-  print('bailed: {:,d}'.format(nbailed))
