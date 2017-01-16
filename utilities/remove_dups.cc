@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdint>
+#include <cstdlib>
 
 using namespace std;
 
@@ -11,7 +11,7 @@ int const MAX_NMODES = 1024;
 
 struct nonzero
 {
-  uint64_t inds[MAX_NMODES];
+  size_t inds[MAX_NMODES];
   double   val;
 };
 
@@ -70,8 +70,8 @@ int main(int argc, char ** argv)
   read_nnz(fin, buf[prev], nmodes);
   read_nnz(fin, buf[curr], nmodes);
 
-  uint64_t seen = 1;
-  uint64_t pruned = 0;
+  size_t seen = 1;
+  size_t pruned = 0;
 
   bool duplicate = true;
 
@@ -111,7 +111,8 @@ int main(int argc, char ** argv)
   }
 
   fout.close();
-  cerr << "seen: " << seen << " pruned: " << pruned << endl;
+  cout << "nnz: " << seen << " pruned: " << pruned << endl;
+  cout << "new nnz: " << seen - pruned << endl;
 
   return 0;
 }
