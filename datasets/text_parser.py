@@ -23,7 +23,6 @@ filter_table = str.maketrans(\
 stemmer = PorterStemmer()
 
 def parse_text(text_string):
-  nbailed = 0
   for word in text_string.translate(filter_table).split():
     if word not in stop_words:
       # sometimes the stemmer crashes due to maximum recursion depth?

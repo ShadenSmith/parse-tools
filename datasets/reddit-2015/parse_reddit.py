@@ -52,15 +52,9 @@ Sample comment (in JSON):
 }
 '''
 
-def assign_id(dic, item):
-  if item not in dic:
-    dic[item] = 1 + len(dic)
-  return dic[item]
-
-
 def get_id(dic, item):
   if item not in dic:
-    return None
+    dic[item] = 1 + len(dic)
   return dic[item]
 
 
@@ -156,7 +150,7 @@ with open('users.counts', 'w') as user_file:
   for u in user_counts:
     if user_counts[u] >= USER_MIN:
       user_file.write('{} {}\n'.format(user_counts[u], u))
-      assign_id(user_ids, u)
+      get_id(user_ids, u)
 del user_counts
 
 
@@ -164,7 +158,7 @@ with open('subreddits.counts', 'w') as sub_file:
   for u in sub_counts:
     if sub_counts[u] >= SUB_MIN:
       sub_file.write('{} {}\n'.format(sub_counts[u], u))
-      assign_id(sub_ids, u)
+      get_id(sub_ids, u)
 del sub_counts
 
 
@@ -172,7 +166,7 @@ with open('words.counts', 'w') as word_file:
   for u in word_counts:
     if word_counts[u] >= WORD_MIN and (WORD_MAX == -1 or word_counts[u] <= WORD_MAX):
       word_file.write('{} {}\n'.format(word_counts[u], u))
-      assign_id(word_ids, u)
+      get_id(word_ids, u)
 del word_counts
 
 write_ids('users.txt', user_ids)
