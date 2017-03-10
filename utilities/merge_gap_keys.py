@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# This script takes a gap file produced by fix_gaps.py or SPLATT and a map file
-# of keys, and merges them into a new map file with gapped keys removed.
+# This script takes a gap file produced by prune_infreq.py or SPLATT and a map
+# file of keys, and merges them into a new map file with gapped keys removed.
 ##############################################################################
 
 import sys
