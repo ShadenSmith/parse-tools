@@ -10,6 +10,9 @@ import text_parser
 import bz2
 import json
 
+
+import datetime
+
 from collections import defaultdict, Counter
 
 
@@ -70,8 +73,8 @@ def write_ids(fname, dic):
 
 
 # convert UTC to day resolution
-def convert_utc(utc_int):
-  return int(utc_int / (60 * 60 * 24))
+def convert_utc(utc_str):
+  return str(datetime.date.fromtimestamp(int(utc_str)))
 
 user_counts = Counter()
 sub_counts  = Counter()
@@ -169,10 +172,10 @@ with open('words.counts', 'w') as word_file:
       get_id(word_ids, u)
 del word_counts
 
-write_ids('users.txt', user_ids)
-write_ids('subreddits.txt', sub_ids)
-write_ids('words.txt', word_ids)
-write_ids('dates.txt', dates)
+write_ids('mode-1-dates.map', dates)
+write_ids('mode-2-users.map', user_ids)
+write_ids('mode-3-subreddits.map', sub_ids)
+write_ids('mode-4-words.map', word_ids)
 
 print('comments: {:,d} (avg length: {:0.2f})'.format(ncomments, float(nwords) / float(ncomments)))
 print('users: {:,d}'.format(len(user_ids)))
@@ -196,14 +199,14 @@ with bz2.open(TMP_FILE + '.bz2', 'rt') as bfile:
     uid = get_id(user_ids, comment[0])
     sid = get_id(sub_ids, comment[1])
     wid = get_id(word_ids, comment[2])
-    tid = get_id(dates, int(comment[3]))
+    tid = get_id(dates, comment[3])
 
     if uid is None or sid is None or tid is None or wid is None:
       pruned += 1
       continue
 
     print('{} {} {} 1'.format(uid, sid, wid), file=t3file)
-    print('{} {} {} {} 1'.format(uid, sid, wid, tid), file=t4file)
+    print('{} {} {} {} 1'.format(tid, uid, sid, wid), file=t4file)
     nnz += 1
 
 t3file.close()
