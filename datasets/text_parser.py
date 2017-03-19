@@ -1,4 +1,5 @@
 
+import sys
 from nltk.stem.porter import PorterStemmer
 import string
 
@@ -22,12 +23,16 @@ filter_table = str.maketrans(\
 # load porter stemmer
 stemmer = PorterStemmer()
 
+max_word_len = sys.getrecursionlimit()
+
 def parse_text(text_string):
   for word in text_string.translate(filter_table).split():
-    if word not in stop_words:
-      # sometimes the stemmer crashes due to maximum recursion depth?
+    # Sometimes the stemmer crashes due to maximum recursion depth.
+    # Don't parse very long words.
+    if (word not in stop_words) and (len(word) < max_word_len):
       try:
         yield stemmer.stem(word)
-      except GeneratorExit:
+      except:
+        print("ERROR '{}'".format(word))
         break
 
