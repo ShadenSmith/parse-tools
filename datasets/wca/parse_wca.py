@@ -67,7 +67,18 @@ for entry in data :
     elif int(entry[4]) > 0 : # use best if best > 0
         _time = int(entry[4])
 
+    # FMC and MBLD have different result formats
+    if (entry[1] == '333fm') or (entry[1] == '333mbf'):
+      continue
+
+    # XXX
+    # only do 333 for now
+    if entry[1] != '333':
+      continue
+
     if _time > 0:
+        _time = float(_time) / 100. # convert back to seconds
+
         # A few WCA IDs have no times associated with them, so make sure that
         # they are not added to the tensor.
         _competition = getOrSetDictVal(entry[0], Competitions)
@@ -75,11 +86,13 @@ for entry in data :
         _round = getOrSetDictVal(entry[2], Rounds)
         _person = getOrSetDictVal(entry[7], Persons)
 
-        _result = (_competition, _event, _round, _person, _time);
+        #_result = (_competition, _event, _round, _person, _time);
+        _result = (_competition, _round, _person, _time);
         Results.append(_result)
 
 # Save tensor file
-numpy.savetxt("WCA_Results.tns", Results, delimiter=" ", fmt='%i')
+#numpy.savetxt("WCA_Results.tns", Results, fmt='%u %u %u %u %0.2f')
+numpy.savetxt("WCA_Results.tns", Results, fmt='%u %u %u %0.2f')
 
 def writeMap(_dict, _file) :
     with open(_file, 'w') as f:
