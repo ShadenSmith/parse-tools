@@ -1,26 +1,53 @@
 #!/usr/bin/env python2
 
+
+#
+# NOTE: Due to some competitions without results, this script will still
+# generate a tensor with some gaps in the competition mode.
+#
+
 import csv
 import urllib
 import zipfile
+import datetime
 import numpy
 
 urllib.urlretrieve('https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip', 'WCA_export.tsv.zip')
 zip_ref = zipfile.ZipFile('WCA_export.tsv.zip', 'r')
 zip_ref.extract('WCA_export_Results.tsv')
+zip_ref.extract('WCA_export_Competitions.tsv')
 zip_ref.close()
 
-with open('WCA_export_Results.tsv', 'r') as f:
-    reader = csv.reader(f, delimiter="\t")
-    data = list(reader)
-
-data = data[1:] # First line is a header
 
 # dicts
 Competitions = dict()
 Events = dict()
 Rounds = dict()
 Persons = dict()
+
+
+# Parse competition dates and assign contiguous IDs
+Competition_dates = dict()
+with open('WCA_export_Competitions.tsv', 'r') as f:
+    reader = csv.reader(f, delimiter="\t")
+    reader.next() # skip header
+    for line in reader:
+        comp_id = line[0]
+        year  = int(line[5])
+        month = int(line[6])
+        day   = int(line[7])
+        Competition_dates[comp_id] = datetime.date(year, month, day)
+
+# Assign contiguous competition IDs, sorted by date
+for comp in sorted(Competition_dates, key=Competition_dates.get) :
+    Competitions[comp] = len(Competitions) + 1
+
+# Read solve data
+with open('WCA_export_Results.tsv', 'r') as f:
+    reader = csv.reader(f, delimiter="\t")
+    data = list(reader)
+
+data = data[1:] # First line is a header
 
 # Tensor
 Results = []
